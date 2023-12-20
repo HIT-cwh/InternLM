@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader, Dataset, Sampler
 from internlm.core.context import ParallelMode
 from internlm.core.context import global_context as gpc
 from internlm.utils.logger import get_logger
+import os
 
 logger = get_logger(__file__)
 
@@ -205,6 +206,10 @@ class StaticBatchSampler:
         data_rank=0,
         data_world_size=1,
     ):
+        if os.environ.get('DIFFERENT_SEED') == 'True':
+            seed = 20000
+            if gpc.is_rank_for_log():
+                logger.info(f"Set seed to 20000 in StaticBatchSampler")
         assert drop_last is True, "Currently only support drop last"
         if rampup_batch_size:
             # In the process increase to batch_size

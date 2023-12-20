@@ -48,7 +48,12 @@ class PackedDataset(torch.utils.data.Dataset):
         self.packed_length = packed_length
         # Force a seed to be fixed to prevent problems caused by the seed not being restored when restarting
 
-        self.seed = DEFAULT_SEED
+        if os.environ.get('DIFFERENT_SEED') == 'True':
+            self.seed = 10000
+            if gpc.is_rank_for_log():
+                logger.info(f"Set seed to 10000 in PackedDataset")
+        else:
+            self.seed = DEFAULT_SEED
         self.sample_indices, self.len_samples_shuffled, self.acm_len_samples = self.accu_sample_len(seed=self.seed)
         self.num_tokens = sum(self.lengths)
 
